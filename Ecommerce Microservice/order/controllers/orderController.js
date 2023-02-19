@@ -4,7 +4,7 @@ let channel;
 function connect() {
   amqp
     .connect(
-      `amqp://shuklaritvik06:${process.env.RABBITPASSWORD}@rabbit-jib0:5672`
+      `amqp://shuklaritvik05:${process.env.RABBITPASSWORD}@rabbit-jib0:5672`
     )
     .then((conn) => {
       conn.createChannel().then((ch) => {
