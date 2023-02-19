@@ -2,7 +2,7 @@ const Product = require("../models/productModel");
 const amqp = require("amqplib");
 let channel;
 function connect() {
-  amqp.connect("amqp://rabbit-jib0").then((conn) => {
+  amqp.connect("amqp://rabbit-jib0:5672").then((conn) => {
     conn.createChannel().then((ch) => {
       ch.assertQueue("order");
       channel = ch;
