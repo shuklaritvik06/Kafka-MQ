@@ -15,7 +15,7 @@ amqplib.connect("amqp://localhost:5672", (err, conn) => {
       }
     });
   });
-  setTimeout(()=>{
+  setTimeout(() => {
     conn.close();
     process.exit(0);
   }, 500);
