@@ -2,16 +2,12 @@ const Product = require("../models/productModel");
 const amqp = require("amqplib");
 let channel;
 function connect() {
-  amqp
-    .connect(
-      `amqp://shuklaritvik05:${process.env.RABBITPASSWORD}@rabbit-jib0:5672`
-    )
-    .then((conn) => {
-      conn.createChannel().then((ch) => {
-        ch.assertQueue("order");
-        channel = ch;
-      });
+  amqp.connect(`amqp://guest:guest@localhost:5672`).then((conn) => {
+    conn.createChannel().then((ch) => {
+      ch.assertQueue("order");
+      channel = ch;
     });
+  });
 }
 connect();
 module.exports.create = (req, res) => {
@@ -36,7 +32,6 @@ module.exports.create = (req, res) => {
           console.log(err);
           res.status(500).send(err);
         } else {
-          channel.sendToQueue("product", Buffer.from(JSON.stringify(product)));
           res.status(200).json(product);
         }
       });
@@ -45,7 +40,7 @@ module.exports.create = (req, res) => {
 };
 
 module.exports.buy = (req, res) => {
-  const { name, quantity } = req.body;
+  const { name, quantity, email } = req.body;
   Product.findOne({ name: name }, (err, product) => {
     if (err) {
       res.json({
@@ -59,10 +54,17 @@ module.exports.buy = (req, res) => {
           JSON.stringify({
             id: product._id,
             name: name,
-            quantity: quantity
+            quantity: quantity,
+            email: email
           })
         )
       );
+      Product.updateOne(
+        {
+          name: name
+        },
+        { $set: { quantity: product.quantity - quantity } }
+      ).then(() => {});
       res.status(200).json({ message: "Product added successfully" });
     }
   });
